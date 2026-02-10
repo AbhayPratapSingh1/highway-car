@@ -137,8 +137,9 @@ const drawFace = (face) => {
   if (!face.points || face.points.length < 3) return;
 
   fill(face.color);
+
   stroke(face.strokeColor || [0, 0, 0, 0]);
-  strokeWeight(1);
+  strokeWeight(0);
 
   beginShape();
   for (const point of face.points) {
