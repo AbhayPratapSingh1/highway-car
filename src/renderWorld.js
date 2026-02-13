@@ -10,7 +10,7 @@ const drawEnvironment = () => {
   );
 
   const visibleFaces = getVisibleFaces(clippedFaces);
-  const toDraw = getPrintablePoint(visibleFaces);
+  const toDraw = shapesProjections(visibleFaces);
 
   toDraw.forEach((face) => {
     drawFace(face);
@@ -25,7 +25,7 @@ const drawCar = () => {
   );
 
   const visibleFaces = getVisibleFaces(clippedFaces);
-  const toDraw = getPrintablePoint(visibleFaces);
+  const toDraw = shapesProjections(visibleFaces);
 
   toDraw.forEach((face) => {
     drawFace(face);
@@ -40,7 +40,7 @@ const drawCitizens = () => {
   );
 
   const visibleFaces = getVisibleFaces(clippedFaces);
-  const toDraw = getPrintablePoint(visibleFaces);
+  const toDraw = shapesProjections(visibleFaces);
 
   toDraw.forEach((face) => {
     drawFace(face);

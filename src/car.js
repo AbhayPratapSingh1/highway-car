@@ -1,13 +1,29 @@
 // @ts-nocheck
+
+const drawCars = (cars) => {
+  const faces = getAllFacesWithDetail(cars);
+  const clippedFaces = faces.map((face) => clipFace(face)).filter((each) =>
+    each.points.length > 0
+  );
+
+  const visibleFaces = getVisibleFaces(clippedFaces);
+  const sortedFaces = getSortedFaces(visibleFaces);
+
+  const toDraw = shapesProjections(visibleFaces);
+  toDraw.forEach((face) => {
+    drawFace(face);
+  });
+};
+
 const createCar = (x, y, z, h, w, d) => {
   const carShape = new CarShape(x, y, z, h, w, d, ["#FF1744"], [0, 0, 0, 0]);
   return new Car(carShape);
 };
 
-const createCitizenCar = (x, y, z, h, w, d, color, colorTop) => {
-  const carShape = new CarShape(x, y, z, h, w, d, [
-    random(WORLD_CONSTANTS.UNIVERSAL_PALETTE),
-  ], [0, 0, 0, 50]);
+const createCitizenCar = (x, y, z, h, w, d) => {
+  const colors = [random(WORLD_CONSTANTS.UNIVERSAL_PALETTE)];
+  const stroke = [0, 0, 0, 50];
+  const carShape = new CarShape(x, y, z, h, w, d, colors, stroke);
   return new CitizensCar(carShape);
 };
 
@@ -47,33 +63,31 @@ class Car {
   }
 
   move() {
-    const delta = WORLD_CONSTANTS.CAR.SENSTIVITY;
+    const deltaZ = WORLD_CONSTANTS.CAR.SENSTIVITY;
+    const deltaX = deltaZ * this.v.z / 5;
 
-    if (keyIsDown(LEFT_ARROW)) {
-      this.a.add(-delta, 0, 0);
-    }
-
-    if (keyIsDown(RIGHT_ARROW)) {
-      this.a.add(+delta, 0, 0);
-    }
+    let dx = 0;
+    let dz = 0;
 
     if (keyIsDown(UP_ARROW)) {
-      this.a.add(0, 0, delta);
+      this.a.add(0, 0, deltaZ);
+      dz += deltaZ;
+    }
+
+    if (keyIsDown(LEFT_ARROW) && !nearlyEqual(this.v.z, 0, 1)) {
+      this.a.add(-deltaX, 0, 0);
+      dx += -deltaX;
+    }
+
+    if (keyIsDown(RIGHT_ARROW) && !nearlyEqual(this.v.z, 0, 1)) {
+      this.a.add(+deltaX, 0, 0);
+      dx += deltaX;
     }
   }
 
-  isAnyPointOutLeft = () => {
-    const worldW2 = WORLD_CONSTANTS.ROAD.WIDTH / 2;
-    return this.shape.points.some((point) => point.x < worldW2);
-  };
-  isAnyPointOutRight = () => {
-    const worldW2 = WORLD_CONSTANTS.ROAD.WIDTH / 2;
-    return this.shape.points.some((point) => point.x > worldW2);
-  };
   updatePos = () => {
     const worldW2 = WORLD_CONSTANTS.ROAD.WIDTH / 2;
     this.pos.add(this.v);
-    const dx = this.v.x;
 
     this.shape.points.forEach((point) => {
       point.add(this.v);

@@ -1,4 +1,7 @@
 const WORLD_CONSTANTS = {
+  SCREEN: {
+    Z: 700,
+  },
   CAR: {
     SENSTIVITY: 3,
     Z: 250,
@@ -9,8 +12,8 @@ const WORLD_CONSTANTS = {
   },
   CAMERA: {
     Z: 700,
+    X: 0,
     vOffsetX: 50,
-
     vOffsetZ: 700,
   },
   ROAD: {

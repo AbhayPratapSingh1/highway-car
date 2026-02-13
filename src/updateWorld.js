@@ -29,19 +29,16 @@ const handlerZMovement = () => {
   }
 };
 
-const handlerXMovement = () => {
-  const carX = WORLD_CONSTANTS.CAR.X;
-  const offsetX = WORLD_CONSTANTS.CAMERA.vOffsetX;
-  const car = gameState.car;
-  const changeInX = car.pos.x - gameState.center.x;
-  console.log(round(changeInX, 0), round(car.pos.x, 0), gameState.center.x);
+const nearlyEqual = (a, b, delta = 0.001) => {
+  return Math.abs(a - b) < delta;
+};
 
-  if (changeInX > offsetX) {
-    const delta = changeInX - (offsetX - 1);
-    // moveWorldBackword(delta, "x");
-  } else if (changeInX > 0) {
-    const delta = changeInX / 20;
-    // moveWorldBackword(delta, "x");
+const handlerXMovement = () => {
+  const car = gameState.car;
+
+  if (!nearlyEqual(WORLD_CONSTANTS.CAMERA.X, car.pos.x, 5)) {
+    const delta = (car.pos.x - WORLD_CONSTANTS.CAMERA.X) / 20;
+    moveWorldBackword(delta, "x");
   }
 };
 
@@ -49,10 +46,11 @@ const updateCitizenCar = () => {
   gameState.citizens.forEach((car) => car.update());
 };
 
-const updateCar = () => {
+const update = () => {
   const car = gameState.car;
   car.update();
+  updateCitizenCar();
+
   handlerZMovement();
   handlerXMovement();
-  updateCitizenCar();
 };

@@ -1,4 +1,16 @@
 // @ts-nocheck
+
+const isBetween = (min, value, max) => value < max && value > min;
+
+const isCollide = (shape, rect) => {
+  const delta = WORLD_CONSTANTS.WORLD.collisionDelta;
+  const { pos: { x: x2, y: y2 } } = shape;
+  const { pos: { x, y }, h, w } = rect;
+
+  return x > x2 - w / 2 - delta && x < x2 + w / 2 + delta &&
+    y > y2 - h / 2 - delta && y < y2 + h / 2 + delta;
+};
+
 const rotatePointAroundPoint = (p1, p2, da, k1 = "x", k2 = "z") => {
   const dx = p1[k1] - p2[k1];
   const dz = p1[k2] - p2[k2];
@@ -6,22 +18,20 @@ const rotatePointAroundPoint = (p1, p2, da, k1 = "x", k2 = "z") => {
   const angle = Math.atan2(dz, dx) + radians(da);
   const radius = Math.sqrt(Math.pow(dx, 2) + Math.pow(dz, 2));
 
-  const key1 = Math.sin(angle) * radius + p2[k2];
-  const key2 = Math.cos(angle) * radius + p2[k1];
+  const key1Value = Math.sin(angle) * radius + p2[k2];
+  const key2Value = Math.cos(angle) * radius + p2[k1];
 
-  return [key2, key1];
+  return [key2Value, key1Value];
 };
 
-const normalOfFace = (p1, p2, p3) => {
+const normal = (p1, p2, p3) => {
   const s1 = p5.Vector.sub(p1, p2);
   const s2 = p5.Vector.sub(p3, p2);
 
-  const normal = s2.cross(s1);
-
-  return normal;
+  return s2.cross(s1);
 };
 
-const getProspectivePoint = (point, screen) => {
+const getProspectivePoint = (point, screen = WORLD_CONSTANTS.SCREEN.Z) => {
   const zUnitVector = createVector(0, 0, 1);
 
   const zProjectionP1 = point.dot(zUnitVector);
@@ -37,61 +47,37 @@ const getProspectivePoint = (point, screen) => {
 const centerOfFace = (...points) => {
   const faceCenterX = points.reduce((s, p) => s + p.x, 0) / points.length;
   const faceCenterY = points.reduce((s, p) => s + p.y, 0) / points.length;
-
   const faceCenterZ = points.reduce((s, p) => s + p.z, 0) / points.length;
+
   return createVector(faceCenterX, faceCenterY, faceCenterZ);
 };
 
-const metaData = () => {
-  push();
-  noStroke();
-  fill(0);
-  translate(-width / 2, -height / 2);
-  text(`FPS : ${Math.floor(frameRate())}`, width - 150, 60);
-  pop();
+const shapeWithDetails = ({ points, ...props }) => {
+  const faceNormal = normal(...points);
+  const center = centerOfFace(...points);
+  return { normal: faceNormal, points, center, ...props };
 };
-
-const getNormalAndCenter = (face) => {
-  const normal = normalOfFace(...(face.points));
-  const center = centerOfFace(...(face.points));
-
-  return {
-    points: face.points,
-    center,
-    normal,
-    color: face.color,
-    strokeColor: face.strokeColor,
-  };
-};
-
-const NEAR_Z = 0.01;
-
-const isInside = (p) => p.z > NEAR_Z;
 
 const getAllFacesWithDetail = (objects) => {
   const faces = objects.flatMap((each) => each.getFaces());
-  const faceWithNormalAndCenter = faces.map((face) => getNormalAndCenter(face));
+  const faceWithNormalAndCenter = faces.map((face) => shapeWithDetails(face));
   return faceWithNormalAndCenter;
 };
 
-const getSortedFaces = (faces) => {
-  return faces.sort((a, b) => b.center.z - a.center.z);
+const getSortedFaces = (faces) => faces.sort((a, b) => b.center.z - a.center.z);
+
+const projectionPoint = (point, z = WORLD_CONSTANTS.SCREEN.Z) =>
+  getProspectivePoint(point, z);
+
+const faceProjection = ({ points, ...props }) => {
+  const projectionPoints = points.map((point) => projectionPoint(point));
+  return { points: projectionPoints, ...props };
 };
 
-const getPrintablePoint = (faces) => {
-  const toPrint = [];
-  for (const face of faces) {
-    const points = face.points.map((point) =>
-      getProspectivePoint(point, SCREEN_Z)
-    );
-    toPrint.push({ ...face, points });
-  }
-  return toPrint;
-};
+const shapesProjections = (faces) => faces.map((face) => faceProjection(face));
 
-const getVisibleFaces = (faces) => {
-  return faces.filter((face) => face.normal.dot(face.center) < 0);
-};
+const getVisibleFaces = (faces) =>
+  faces.filter((face) => face.normal.dot(face.center) < 0);
 
 const getClippedPoint = (p1, p2) => {
   const targetZ = 0.1;
@@ -105,10 +91,9 @@ const getClippedPoint = (p1, p2) => {
 
   const x = (dx * ratio) + p1.x;
   const y = (dy * ratio) + p1.y;
+
   return createVector(x, y, targetZ);
 };
-
-const SCREEN_Z = 700;
 
 const clipFace = (face) => {
   const points = [];
