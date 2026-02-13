@@ -60,6 +60,7 @@ const shapeWithDetails = ({ points, ...props }) => {
 
 const getAllFacesWithDetail = (objects) => {
   const faces = objects.flatMap((each) => each.getFaces());
+
   const faceWithNormalAndCenter = faces.map((face) => shapeWithDetails(face));
   return faceWithNormalAndCenter;
 };

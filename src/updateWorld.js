@@ -6,26 +6,24 @@ const moveWorldBackword = (
     ...gameState.environments,
     ...gameState.citizens.map((each) => each.shape),
   ];
+
   for (const entitiy of toUpdate) {
     entitiy.pos[axis] -= delta;
-    entitiy.points.forEach((point) => point[axis] -= delta);
   }
-
-  gameState.car.pos[axis] -= delta;
-  gameState.car.shape.points.forEach((point) => point[axis] -= delta);
 };
 
-const handlerZMovement = () => {
-  const carZ = WORLD_CONSTANTS.CAR.Z;
-  const offsetZ = WORLD_CONSTANTS.CAMERA.vOffsetZ;
-  const car = gameState.car;
+const cameraZMovement = () => {
+  const carZ = WORLD_CONSTANTS.CAR_SCREEN.Z;
+  const car = gameState.car.shape;
 
-  if (car.pos.z - gameState.center.z > carZ + offsetZ) {
-    const delta = car.pos.z - (carZ + offsetZ - 2);
+  const cameraMovementSpeed = WORLD_CONSTANTS.CAMERA.speed;
+  const center = gameState.center;
+  const diff = car.pos.z - center.z;
+
+  if (diff > carZ) {
+    const delta = (car.pos.z - center.z - carZ) / cameraMovementSpeed;
     moveWorldBackword(delta);
-  } else if (car.pos.z - gameState.center.z > carZ) {
-    const delta = (car.pos.z - carZ) / 20;
-    moveWorldBackword(delta);
+    gameState.car.pos.z -= delta;
   }
 };
 
@@ -33,12 +31,17 @@ const nearlyEqual = (a, b, delta = 0.001) => {
   return Math.abs(a - b) < delta;
 };
 
-const handlerXMovement = () => {
-  const car = gameState.car;
+const cameraXMovement = () => {
+  const carX = WORLD_CONSTANTS.CAR_SCREEN.X;
+  const car = gameState.car.shape;
+  const cameraMovementSpeed = WORLD_CONSTANTS.CAMERA.speed;
+  const center = gameState.center;
+  const diff = car.pos.x - center.x;
 
-  if (!nearlyEqual(WORLD_CONSTANTS.CAMERA.X, car.pos.x, 5)) {
-    const delta = (car.pos.x - WORLD_CONSTANTS.CAMERA.X) / 20;
+  if (Math.abs(diff) > carX) {
+    const delta = (car.pos.x - center.x - carX) / cameraMovementSpeed;
     moveWorldBackword(delta, "x");
+    gameState.car.pos.x -= delta;
   }
 };
 
@@ -49,8 +52,8 @@ const updateCitizenCar = () => {
 const update = () => {
   const car = gameState.car;
   car.update();
-  updateCitizenCar();
 
-  handlerZMovement();
-  handlerXMovement();
+  updateCitizenCar();
+  cameraZMovement();
+  cameraXMovement();
 };

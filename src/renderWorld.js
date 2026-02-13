@@ -5,6 +5,7 @@ const drawSun = () => {
 
 const drawEnvironment = () => {
   const faces = getAllFacesWithDetail(gameState.environments);
+
   const clippedFaces = faces.map((face) => clipFace(face)).filter((each) =>
     each.points.length > 0
   );

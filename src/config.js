@@ -4,8 +4,6 @@ const WORLD_CONSTANTS = {
   },
   CAR: {
     SENSTIVITY: 3,
-    Z: 250,
-    X: 0,
   },
   WORLD: {
     FRICTION: 0.1,
@@ -13,9 +11,15 @@ const WORLD_CONSTANTS = {
   CAMERA: {
     Z: 700,
     X: 0,
+    speed: 20,
     vOffsetX: 50,
     vOffsetZ: 700,
   },
+  CAR_SCREEN: {
+    Z: 200,
+    X: 0,
+  },
+
   ROAD: {
     WIDTH: 400,
     LENGHT: 100_000,

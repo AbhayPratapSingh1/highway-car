@@ -43,8 +43,6 @@ class CitizensCar {
     const worldW2 = WORLD_CONSTANTS.ROAD.WIDTH / 2;
     return this.shape.points.some((point) => point.x > worldW2);
   };
-  updatePos = () => {
-  };
 
   update() {
     this.pos.add(this.v);
@@ -66,34 +64,29 @@ class Car {
     const deltaZ = WORLD_CONSTANTS.CAR.SENSTIVITY;
     const deltaX = deltaZ * this.v.z / 5;
 
-    let dx = 0;
-    let dz = 0;
+    if (keyIsDown(UP_ARROW)) this.a.add(0, 0, deltaZ);
+    const shouldShift = !nearlyEqual(this.v.z, 0, 1);
 
-    if (keyIsDown(UP_ARROW)) {
-      this.a.add(0, 0, deltaZ);
-      dz += deltaZ;
-    }
+    if (keyIsDown(LEFT_ARROW) && shouldShift) this.a.add(-deltaX, 0, 0);
 
-    if (keyIsDown(LEFT_ARROW) && !nearlyEqual(this.v.z, 0, 1)) {
-      this.a.add(-deltaX, 0, 0);
-      dx += -deltaX;
-    }
-
-    if (keyIsDown(RIGHT_ARROW) && !nearlyEqual(this.v.z, 0, 1)) {
-      this.a.add(+deltaX, 0, 0);
-      dx += deltaX;
-    }
+    if (keyIsDown(RIGHT_ARROW) && shouldShift) this.a.add(+deltaX, 0, 0);
   }
 
   updatePos = () => {
-    const worldW2 = WORLD_CONSTANTS.ROAD.WIDTH / 2;
+    const delta = (WORLD_CONSTANTS.ROAD.WIDTH - this.shape.w) / 2;
+
     this.pos.add(this.v);
+    gameState.deviation.add(this.v);
 
-    this.shape.points.forEach((point) => {
-      point.add(this.v);
-    });
+    if (Math.abs(gameState.deviation.x) > delta) {
+      const side = Math.sign(gameState.deviation.x);
+      const moveMentSide = Math.sign(this.v.x);
 
-    this.pos.x = constrain(this.pos.x, -worldW2, worldW2);
+      if (side === moveMentSide) {
+        this.pos.x -= this.v.x;
+        gameState.deviation.x -= this.v.x;
+      }
+    }
   };
 
   update() {
@@ -101,179 +94,155 @@ class Car {
     this.v.add(this.a);
 
     this.updatePos();
+
     this.a.mult(0.9);
     this.v.mult(WORLD_CONSTANTS.WORLD.FRICTION);
   }
 }
-
 class CarShape {
-  constructor(x, y, z, w, h, d, colorPalette) {
+  constructor(x, y, z, w, h, d, colorPalette, strokeColor = "black") {
     this.pos = createVector(x, y, z);
-    this.w = w; // Width
-    this.h = h; // Total Height
-    this.d = d; // Total Length
+    this.w = w;
+    this.h = h;
+    this.d = d;
     this.colorPalette = colorPalette || ["#333", "#444", "#222", "#555"];
+    this.strokeColor = strokeColor;
 
-    this.points = [];
-    this.parts = []; // Stores indices for different car sections
-    this.createModel();
+    // Like Cube class: Template vs Transformed
+    this.OGpoint = this.createModelVertices();
+    this.points = this.createModelVertices();
+
+    this.rotations = createVector(0, 0, 0);
   }
 
-  // Helper to create a box and return its points
-  createBox(offset, w, h, d) {
-    const w2 = w / 2, h2 = h / 2, d2 = d / 2;
-    const p = p5.Vector.add(this.pos, offset);
+  // Helper to generate 8 vertices for a sub-box
+  createBoxVertices(offset, w, h, d) {
+    const [w2, h2, d2] = [w / 2, h / 2, d / 2];
     return [
-      createVector(-w2, -h2, -d2).add(p), // 0: Top-Front-Left
-      createVector(-w2, +h2, -d2).add(p), // 1: Bottom-Front-Left
-      createVector(+w2, +h2, -d2).add(p), // 2: Bottom-Front-Right
-      createVector(+w2, -h2, -d2).add(p), // 3: Top-Front-Right
-      createVector(+w2, -h2, +d2).add(p), // 4: Top-Back-Right
-      createVector(+w2, +h2, +d2).add(p), // 5: Bottom-Back-Right
-      createVector(-w2, +h2, +d2).add(p), // 6: Bottom-Back-Left
-      createVector(-w2, -h2, +d2).add(p), // 7: Top-Back-Left
+      createVector(-w2 + offset.x, -h2 + offset.y, -d2 + offset.z), // 0
+      createVector(-w2 + offset.x, +h2 + offset.y, -d2 + offset.z), // 1
+      createVector(+w2 + offset.x, +h2 + offset.y, -d2 + offset.z), // 2
+      createVector(+w2 + offset.x, -h2 + offset.y, -d2 + offset.z), // 3
+      createVector(+w2 + offset.x, -h2 + offset.y, +d2 + offset.z), // 4
+      createVector(+w2 + offset.x, +h2 + offset.y, +d2 + offset.z), // 5
+      createVector(-w2 + offset.x, +h2 + offset.y, +d2 + offset.z), // 6
+      createVector(-w2 + offset.x, -h2 + offset.y, +d2 + offset.z), // 7
     ];
   }
 
-  createModel() {
-    this.points = [];
+  createModelVertices() {
+    let allVertices = [];
 
-    // 1. MAIN CHASSIS (Lower body)
-    const chassis = this.createBox(
-      createVector(0, 0, 0),
-      this.w,
-      this.h * 0.4,
-      this.d,
+    // 1. Chassis (8 points)
+    allVertices.push(
+      ...this.createBoxVertices(
+        createVector(0, 0, 0),
+        this.w,
+        this.h * 0.4,
+        this.d,
+      ),
     );
-    this.points.push(...chassis);
 
-    // 2. CABIN (The glass/roof area - slanted forward)
-    const cabinW = this.w * 0.85;
-    const cabinH = this.h * 0.45;
-    const cabinD = this.d * 0.4;
+    // 2. Cabin (8 points)
     const cabinPos = createVector(0, -this.h * 0.4, this.d * 0.05);
-    const cabin = this.createBox(cabinPos, cabinW, cabinH, cabinD);
-    this.points.push(...cabin);
+    allVertices.push(
+      ...this.createBoxVertices(
+        cabinPos,
+        this.w * 0.85,
+        this.h * 0.45,
+        this.d * 0.4,
+      ),
+    );
 
-    // 3. WHEELS (4 small blocks)
+    // 3. Wheels (4 boxes * 8 points = 32 points)
     const wheelW = this.w * 0.2;
     const wheelH = this.h * 0.3;
     const wheelD = this.d * 0.15;
     const wheelOffsets = [
-      createVector(-this.w * 0.45, this.h * 0.2, -this.d * 0.3), // Front Left
-      createVector(this.w * 0.45, this.h * 0.2, -this.d * 0.3), // Front Right
-      createVector(-this.w * 0.45, this.h * 0.2, this.d * 0.3), // Back Left
-      createVector(this.w * 0.45, this.h * 0.2, this.d * 0.3), // Back Right
+      createVector(-this.w * 0.45, this.h * 0.2, -this.d * 0.3),
+      createVector(this.w * 0.45, this.h * 0.2, -this.d * 0.3),
+      createVector(-this.w * 0.45, this.h * 0.2, this.d * 0.3),
+      createVector(this.w * 0.45, this.h * 0.2, this.d * 0.3),
     ];
 
     wheelOffsets.forEach((off) => {
-      this.points.push(...this.createBox(off, wheelW, wheelH, wheelD));
+      allVertices.push(...this.createBoxVertices(off, wheelW, wheelH, wheelD));
+    });
+
+    return allVertices;
+  }
+
+  changeRotation(x = 0, y = 0, z = 0) {
+    this.rotations.add(createVector(x, y, z));
+  }
+
+  rotateInAxis(point, angle, fromAxis = "x", toAxis = "y") {
+    let c = cos(angle);
+    let s = sin(angle);
+    let fromAxisPoint = point[fromAxis] * c - point[toAxis] * s;
+    let toAxisPoint = point[fromAxis] * s + point[toAxis] * c;
+    return [fromAxisPoint, toAxisPoint];
+  }
+
+  rotateVertices() {
+    this.OGpoint.forEach((point, i) => {
+      let newX, newY, newZ;
+      let dx = 0, dy = 0, dz = 0;
+
+      [newY, newZ] = this.rotateInAxis(point, this.rotations.x, "y", "z");
+      dy += newY - point.y;
+      dz += newZ - point.z;
+
+      [newZ, newX] = this.rotateInAxis(point, this.rotations.y, "z", "x");
+      dx += newX - point.x;
+      dz += newZ - point.z;
+
+      [newX, newY] = this.rotateInAxis(point, this.rotations.z, "x", "y");
+      dx += newX - point.x;
+      dy += newY - point.y;
+
+      this.points[i].x = point.x + dx;
+      this.points[i].y = point.y + dy;
+      this.points[i].z = point.z + dz;
     });
   }
 
   getFaces() {
+    this.rotateVertices();
     const faces = [];
     const faceIndices = [
       [0, 1, 2, 3],
       [4, 5, 6, 7], // Front, Back
-      [7, 6, 1, 0],
-      [3, 2, 5, 4], // Left, Right
-      [7, 0, 3, 4],
-      [1, 6, 5, 2], // Top, Bottom
+      [0, 3, 4, 7],
+      [1, 2, 5, 6], // Top, Bottom
+      [0, 7, 6, 1],
+      [2, 5, 4, 3], // Left, Right
     ];
 
-    // Every 8 points in this.points is a new box
     for (let i = 0; i < this.points.length; i += 8) {
       const partPoints = this.points.slice(i, i + 8);
-      const isWheel = i >= 16;
       const isCabin = i === 8;
+      const isWheel = i >= 16;
 
       faceIndices.forEach((idx, fIdx) => {
         let color = this.colorPalette[fIdx % this.colorPalette.length];
+        let sCol = this.strokeColor;
 
-        // Custom styling for realism
-        if (isWheel) color = "#111"; // Wheels are dark
-        if (isCabin && fIdx === 0) color = "#88ccff"; // Front windshield tint
+        if (isWheel) {
+          color = "#111";
+          sCol = "#000";
+        }
+        if (isCabin && fIdx === 0) color = "#88ccff"; // Windshield
 
         faces.push({
-          points: idx.map((index) => partPoints[index]),
+          points: idx.map((index) =>
+            p5.Vector.add(partPoints[index], this.pos)
+          ),
           color: color,
-          strokeColor: isWheel ? "#000" : "rgba(0,0,0,0.2)",
+          strokeColor: sCol,
         });
       });
     }
     return faces;
-  }
-}
-class Cube {
-  constructor(x, y, z, h, w, d, color, strokeColor = "black") {
-    color = color || WORLD_ITEMS.palettes;
-
-    this.pos = createVector(x, y, z);
-    this.h = h;
-    this.w = w;
-    this.d = d;
-
-    this.rotations = { x: 0, y: 0, z: 0 };
-
-    this.strokeColor = strokeColor;
-    this.color = color;
-
-    this.points = this.createVertices();
-  }
-
-  createVertices() {
-    const w2 = this.w / 2;
-    const h2 = this.h / 2;
-    const d2 = this.d / 2;
-
-    const p1 = createVector(-w2, -h2, -d2).add(this.pos); // F-T-L
-    const p2 = createVector(-w2, +h2, -d2).add(this.pos); // F-B-L
-    const p3 = createVector(+w2, +h2, -d2).add(this.pos); // F-B-R
-    const p4 = createVector(+w2, -h2, -d2).add(this.pos); // F-T-R
-    const p5 = createVector(+w2, -h2, +d2).add(this.pos); // B-T-R
-    const p6 = createVector(+w2, +h2, +d2).add(this.pos); // B-B-R
-    const p7 = createVector(-w2, +h2, +d2).add(this.pos); // B-B-L
-    const p8 = createVector(-w2, -h2, +d2).add(this.pos); // B-T-L
-    return [p1, p2, p3, p4, p5, p6, p7, p8];
-  }
-
-  getFaces() {
-    const [p1, p2, p3, p4, p5, p6, p7, p8] = this.points;
-
-    const f1 = [p1, p2, p3, p4]; // front
-    const f2 = [p5, p6, p7, p8]; // back
-    const f3 = [p8, p7, p2, p1]; // left
-    const f4 = [p4, p3, p6, p5]; // right
-    const f5 = [p8, p1, p4, p5]; // top
-    const f6 = [p2, p7, p6, p3]; // bottom
-
-    const val = [f1, f2, f3, f4, f5, f6].map((points, i) => ({
-      strokeColor: this.strokeColor,
-      color: this.color[i % this.color.length],
-      points,
-    }));
-
-    return val;
-  }
-
-  rotate(degree, a1 = "x", a2 = "y", reference = undefined) {
-    reference = reference || this.pos;
-
-    this.points.forEach((point) => {
-      const [v1, v2] = rotatePointAroundPoint(point, reference, degree, a1, a2);
-      point[a1] = v1;
-      point[a2] = v2;
-    });
-
-    const [v1, v2] = rotatePointAroundPoint(
-      this.pos,
-      reference,
-      degree,
-      a1,
-      a2,
-    );
-    this.pos[a1] = v1;
-    this.pos[a2] = v2;
   }
 }
