@@ -1,29 +1,15 @@
-const moveWorldBackword = (
-  delta = WORLD_CONSTANTS.CAR.SENSTIVITY,
-  axis = "z",
-) => {
-  const toUpdate = [
-    ...gameState.environments,
-    ...gameState.citizens.map((each) => each.shape),
-  ];
+const handleCamera = () => {
+  const diff = p5.Vector.sub(gameState.car.pos, gameState.camera.points);
+  const camera_car_gap = createVector(0, 100, 250);
 
-  for (const entitiy of toUpdate) {
-    entitiy.pos[axis] -= delta;
+  if (diff.z > camera_car_gap.z + 15) {
+    gameState.camera.points.z += diff.z / 20;
+  } else if (diff.z > camera_car_gap.z) {
+    gameState.camera.points.z = gameState.car.pos.z - camera_car_gap.z;
   }
-};
 
-const cameraZMovement = () => {
-  const carZ = WORLD_CONSTANTS.CAR_SCREEN.Z;
-  const car = gameState.car.shape;
-
-  const cameraMovementSpeed = WORLD_CONSTANTS.CAMERA.speed;
-  const center = gameState.center;
-  const diff = car.pos.z - center.z;
-
-  if (diff > carZ) {
-    const delta = (car.pos.z - center.z - carZ) / cameraMovementSpeed;
-    moveWorldBackword(delta);
-    gameState.car.pos.z -= delta;
+  if (!nearlyEqual(Math.abs(diff.x), camera_car_gap.x, 2)) {
+    gameState.camera.points.x += diff.x / 5;
   }
 };
 
@@ -31,28 +17,7 @@ const nearlyEqual = (a, b, delta = 0.001) => {
   return Math.abs(a - b) < delta;
 };
 
-const cameraXMovement = () => {
-  const carX = WORLD_CONSTANTS.CAR_SCREEN.X;
-  const car = gameState.car.shape;
-  const cameraMovementSpeed = WORLD_CONSTANTS.CAMERA.speed;
-  const center = gameState.center;
-  const diff = car.pos.x - center.x;
-
-  if (Math.abs(diff) > carX) {
-    const delta = (car.pos.x - center.x - carX) / cameraMovementSpeed;
-    moveWorldBackword(delta, "x");
-    gameState.car.pos.x -= delta;
-  }
-};
-
-const updateCitizenCar = () => {
-  gameState.citizens.forEach((car) => car.update());
-};
-
 const update = () => {
   gameState.car.update();
-
-  updateCitizenCar();
-  cameraZMovement();
-  cameraXMovement();
+  gameState.citizens.forEach((car) => car.update());
 };

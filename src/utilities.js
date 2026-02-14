@@ -134,3 +134,35 @@ const drawFace = (face) => {
   }
   endShape(CLOSE);
 };
+
+const rotateInAxis = (point, angle, fromAxis = "x", toAxis = "y") => {
+  let c = cos(angle);
+  let s = sin(angle);
+
+  let fromAxisPoint = point[fromAxis] * c - point[toAxis] * s;
+  let toAxisPoint = point[fromAxis] * s + point[toAxis] * c;
+
+  return [fromAxisPoint, toAxisPoint];
+};
+
+const rotateVertices = (point, rotations) => {
+  let newX, newY, newZ;
+  let dx = 0, dy = 0, dz = 0;
+
+  [newY, newZ] = rotateInAxis(point, rotations.x, "y", "z");
+  dy += newY - point.y;
+  dz += newZ - point.z;
+
+  [newZ, newX] = rotateInAxis(point, rotations.y, "z", "x");
+  dx += newX - point.x;
+  dz += newZ - point.z;
+
+  [newX, newY] = rotateInAxis(point, rotations.z, "x", "y");
+  dx += newX - point.x;
+  dy += newY - point.y;
+
+  point.x = point.x + dx;
+  point.y = point.y + dy;
+  point.z = point.z + dz;
+  return point;
+};

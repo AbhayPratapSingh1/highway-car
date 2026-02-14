@@ -1,3 +1,11 @@
+const createCamera = () => {
+  const { x, y, z, rx, ry, rz } = CAMERA_CONFIGURATION;
+  return {
+    points: createVector(x, y, z),
+    rotate: createVector(radians(rx), radians(ry), radians(rz)),
+  };
+};
+
 const createBars = () => {
   const bars = [];
   for (let z = 20; z < WORLD_CONSTANTS.ROAD.LENGHT; z += 250) {
@@ -18,6 +26,7 @@ const createEnvironment = (gameState) => {
   const bars = createBars();
 
   gameState.environments.push(ground, highway, ...bars);
+  console.log(gameState.environments.length);
 };
 
 const createOtherCars = (count = 2, from = -400, to = 10000) => {

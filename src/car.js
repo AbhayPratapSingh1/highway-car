@@ -1,22 +1,9 @@
 // @ts-nocheck
 
-const drawCars = (cars) => {
-  const faces = getAllFacesWithDetail(cars);
-  const clippedFaces = faces.map((face) => clipFace(face)).filter((each) =>
-    each.points.length > 0
-  );
 
-  const visibleFaces = getVisibleFaces(clippedFaces);
-  const sortedFaces = getSortedFaces(visibleFaces);
-
-  const toDraw = shapesProjections(visibleFaces);
-  toDraw.forEach((face) => {
-    drawFace(face);
-  });
-};
-
-const createCar = (x, y, z, h, w, d) => {
-  const carShape = new CarShape(x, y, z, h, w, d, ["#FF1744"], [0, 0, 0, 0]);
+const createCar = () => {
+  const { x, y, z, h, w, d, color, stroke } = CAR_CONFIGURATION;
+  const carShape = new CarShape(x, y, z, h, w, d, color, stroke);
   return new Car(carShape);
 };
 
