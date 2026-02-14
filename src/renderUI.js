@@ -1,8 +1,9 @@
 const renderUI = () => {
-  drawCars([
+  const allCarsParts = [
     ...gameState.citizens.map((each) => each.shape),
     gameState.car.shape,
-  ]);
+  ];
+  drawCars(allCarsParts);
 };
 
 const setBackground = () => {

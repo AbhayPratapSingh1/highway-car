@@ -4,8 +4,8 @@ const isBetween = (min, value, max) => value < max && value > min;
 
 const isCollide = (shape, rect) => {
   const delta = WORLD_CONSTANTS.WORLD.collisionDelta;
-  const { pos: { x: x2, y: y2 } } = shape;
-  const { pos: { x, y }, h, w } = rect;
+  const { x: x2, y: y2 } = shape;
+  const { x, y, h, w } = rect;
 
   return x > x2 - w / 2 - delta && x < x2 + w / 2 + delta &&
     y > y2 - h / 2 - delta && y < y2 + h / 2 + delta;

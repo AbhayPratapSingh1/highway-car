@@ -50,8 +50,7 @@ const updateCitizenCar = () => {
 };
 
 const update = () => {
-  const car = gameState.car;
-  car.update();
+  gameState.car.update();
 
   updateCitizenCar();
   cameraZMovement();

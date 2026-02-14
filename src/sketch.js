@@ -15,8 +15,10 @@ const gameState = {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+
   gameState.center = createVector(0, 0, 0);
   gameState.deviation = createVector(0, 0, 0);
+
   gameState.car = createCar(
     WORLD_CONSTANTS.CAR_SCREEN.X,
     100,
@@ -27,6 +29,12 @@ function setup() {
   );
   gameState.citizens = createOtherCars(10);
   createEnvironment(gameState);
+  const shape = new Cube();
+  const center = createVector(
+    WORLD_CONSTANTS.CAMERA.X,
+    100,
+    WORLD_CONSTANTS.CAMERA.Z,
+  );
 }
 
 function draw() {
@@ -37,5 +45,4 @@ function draw() {
 
   renderUI();
   metaData();
-  // noLoop();
 }

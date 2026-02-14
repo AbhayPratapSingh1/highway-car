@@ -60,7 +60,7 @@ class Car {
     this.a = createVector(0, 0, 0);
   }
 
-  move() {
+  callback() {
     const deltaZ = WORLD_CONSTANTS.CAR.SENSTIVITY;
     const deltaX = deltaZ * this.v.z / 5;
 
@@ -90,7 +90,7 @@ class Car {
   };
 
   update() {
-    this.move();
+    this.callback();
     this.v.add(this.a);
 
     this.updatePos();
@@ -108,14 +108,12 @@ class CarShape {
     this.colorPalette = colorPalette || ["#333", "#444", "#222", "#555"];
     this.strokeColor = strokeColor;
 
-    // Like Cube class: Template vs Transformed
     this.OGpoint = this.createModelVertices();
     this.points = this.createModelVertices();
 
     this.rotations = createVector(0, 0, 0);
   }
 
-  // Helper to generate 8 vertices for a sub-box
   createBoxVertices(offset, w, h, d) {
     const [w2, h2, d2] = [w / 2, h / 2, d / 2];
     return [
@@ -133,7 +131,6 @@ class CarShape {
   createModelVertices() {
     let allVertices = [];
 
-    // 1. Chassis (8 points)
     allVertices.push(
       ...this.createBoxVertices(
         createVector(0, 0, 0),
@@ -143,7 +140,6 @@ class CarShape {
       ),
     );
 
-    // 2. Cabin (8 points)
     const cabinPos = createVector(0, -this.h * 0.4, this.d * 0.05);
     allVertices.push(
       ...this.createBoxVertices(
@@ -154,7 +150,6 @@ class CarShape {
       ),
     );
 
-    // 3. Wheels (4 boxes * 8 points = 32 points)
     const wheelW = this.w * 0.2;
     const wheelH = this.h * 0.3;
     const wheelD = this.d * 0.15;
