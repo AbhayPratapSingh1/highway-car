@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-
 const createCar = () => {
   const { x, y, z, h, w, d, color, stroke } = CAR_CONFIGURATION;
   const carShape = new CarShape(x, y, z, h, w, d, color, stroke);
@@ -18,24 +17,39 @@ class CitizensCar {
   constructor(shape) {
     this.shape = shape;
     this.pos = this.shape.pos;
-    this.v = createVector(0, 0, random(10, 30));
+    this.v = createVector(0, 0, 0);
     this.a = createVector(0, 0, 0);
   }
 
-  isAnyPointOutLeft = () => {
-    const worldW2 = WORLD_CONSTANTS.ROAD.WIDTH / 2;
-    return this.shape.points.some((point) => point.x < worldW2);
-  };
-  isAnyPointOutRight = () => {
-    const worldW2 = WORLD_CONSTANTS.ROAD.WIDTH / 2;
-    return this.shape.points.some((point) => point.x > worldW2);
+  callback() {
+    this.a.add(0, 0, 1);
+  }
+
+  updatePos = () => {
+    const delta = (WORLD_CONSTANTS.ROAD.WIDTH - this.shape.w) / 2;
+    this.pos.add(this.v);
+
+    const otherCars = gameState.citizens.filter((each) => each !== this);
+    otherCars.push(gameState.car);
+
+    const collidingCar = otherCars.find((car) =>
+      isCollide(car.shape, this.shape)
+    );
+
+    if (collidingCar) {
+      this.pos.sub(this.v);
+      this.a.x += 1;
+    }
   };
 
   update() {
-    this.pos.add(this.v);
-    this.shape.points.forEach((point) => {
-      point.add(this.v);
-    });
+    this.callback();
+
+    this.v.add(this.a);
+    this.updatePos();
+
+    this.a.mult(0.9);
+    this.v.mult(WORLD_CONSTANTS.WORLD.FRICTION);
   }
 }
 
@@ -61,8 +75,18 @@ class Car {
 
   updatePos = () => {
     const delta = (WORLD_CONSTANTS.ROAD.WIDTH - this.shape.w) / 2;
-
     this.pos.add(this.v);
+
+    const collidingCar = gameState.citizens.find((car) =>
+      isCollide(car.shape, this.shape)
+    );
+
+    if (collidingCar) {
+      this.pos.sub(this.v);
+      collidingCar.a.add(this.v);
+      this.v.mult(0);
+    }
+
     if (Math.abs(this.pos.x) > delta) {
       const side = Math.sign(this.pos.x);
       const moveMentSide = Math.sign(this.v.x);

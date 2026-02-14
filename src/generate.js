@@ -1,3 +1,4 @@
+// @ts-nocheck
 const createCamera = () => {
   const { x, y, z, rx, ry, rz } = CAMERA_CONFIGURATION;
   return {
@@ -26,7 +27,6 @@ const createEnvironment = (gameState) => {
   const bars = createBars();
 
   gameState.environments.push(ground, highway, ...bars);
-  console.log(gameState.environments.length);
 };
 
 const createOtherCars = (count = 2, from = -400, to = 10000) => {

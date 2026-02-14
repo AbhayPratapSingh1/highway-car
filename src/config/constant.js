@@ -26,12 +26,12 @@ const WORLD_CONSTANTS = {
   },
 
   UNIVERSAL_PALETTE: [
-    "#FFFACDAA",
-    "#27AE60AA",
-    "#F1C40FAA",
-    "#9B59B6AA",
-    "#3498DBAA",
-    "#E67E22AA",
-    "#95A5A6AA",
+    "#FFFACDDD",
+    "#27AE60DD",
+    "#F1C40FDD",
+    "#9B59B6DD",
+    "#3498DBDD",
+    "#E67E22DD",
+    "#95A5A6DD",
   ],
 };

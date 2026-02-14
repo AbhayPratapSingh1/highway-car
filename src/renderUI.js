@@ -1,3 +1,4 @@
+// @ts-nocheck
 const shapeFromCamera = (shape, camera) => {
   const worldPoints = shape.points.map((point) =>
     p5.Vector.sub(point, camera.points)

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const handleCamera = () => {
   const diff = p5.Vector.sub(gameState.car.pos, gameState.camera.points);
   const camera_car_gap = createVector(0, 100, 250);

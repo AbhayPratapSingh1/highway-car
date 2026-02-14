@@ -3,13 +3,12 @@
 const isBetween = (min, value, max) => value < max && value > min;
 
 const isCollide = (shape, rect) => {
-  const delta = 1;
-  const { pos: { x: x2, y: z2 } } = shape;
-  const { pos: { x, z }, l, w } = rect;
-  console.log({ x2, z2, x, z });
+  const { pos: { x: x2, z: z2 }, d: d2, w: w2 } = shape;
+  const { pos: { x, z }, d, w } = rect;
 
-  return x > x2 - w / 2 - delta && x < x2 + w / 2 + delta &&
-    z > z2 - l / 2 - delta && z < z2 + l / 2 + delta;
+  const dx = Math.abs(x2 - x);
+  const dz = Math.abs(z2 - z);
+  return dx <= (w + w2) / 2 && dz <= (d + d2) / 2;
 };
 
 const rotatePointAroundPoint = (p1, p2, da, k1 = "x", k2 = "z") => {

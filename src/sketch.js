@@ -6,6 +6,7 @@ const gameState = {
   center: null,
   environments: [],
   roadBars: [],
+  allCars: [],
   car: null,
   highway: null,
   ground: null,
@@ -20,14 +21,14 @@ function setup() {
   gameState.center = createVector(0, 0, 0);
 
   gameState.car = createCar();
-  const count = random(10);
-  gameState.citizens = createOtherCars(count);
+
+  gameState.citizens = createOtherCars(50, 100, 100000);
+  gameState.allCars = [...gameState.citizens, gameState.car];
 
   createEnvironment(gameState);
 
   gameState.camera = createCamera();
 }
-
 
 function draw() {
   translate(width / 2, height / 2);
