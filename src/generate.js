@@ -1,7 +1,7 @@
 const createBars = () => {
   const bars = [];
   for (let z = 20; z < WORLD_CONSTANTS.ROAD.LENGHT; z += 250) {
-    const bar = createRoadBar(0, 110, z);
+    const bar = createRoadBar(0, 90, z);
     bars.push(bar);
   }
   return bars;

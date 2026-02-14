@@ -76,15 +76,11 @@ class Car {
     const delta = (WORLD_CONSTANTS.ROAD.WIDTH - this.shape.w) / 2;
 
     this.pos.add(this.v);
-    gameState.deviation.add(this.v);
-
-    if (Math.abs(gameState.deviation.x) > delta) {
-      const side = Math.sign(gameState.deviation.x);
+    if (Math.abs(this.pos.x) > delta) {
+      const side = Math.sign(this.pos.x);
       const moveMentSide = Math.sign(this.v.x);
-
       if (side === moveMentSide) {
         this.pos.x -= this.v.x;
-        gameState.deviation.x -= this.v.x;
       }
     }
   };
