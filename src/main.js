@@ -40,7 +40,7 @@ const startNewGame = () => {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  startNewGame();
+  createEnvironment(gameState);
 }
 
 let mode = -1;
@@ -57,63 +57,6 @@ const renderHero = () => {
   );
 
   environment.forEach((face) => drawFace(face));
-};
-
-let time = 0;
-const home = () => {
-  renderHero();
-
-  // either click using mouse or press enter
-  showMouseCallbackOption();
-  if (keyIsDown(ENTER) && millis() - time > 300) {
-    gameState.state = "play";
-    startNewGame();
-    time = millis();
-  }
-};
-
-const finished = () => {
-  renderHero();
-  fill("#EFBF0455");
-  rect(-width / 2, -100, width, 200);
-  textSize(70);
-  textAlign("center", "center");
-  textWidth(10);
-  fill("black");
-  text("Congratulation!!\n You finished the race", 0, 0);
-
-  showMouseCallbackOption();
-  if (keyIsDown(ENTER)) {
-    gameState.state = "home";
-    gameState.count = 1;
-    gameState.framesRendered = 0;
-    time = millis();
-  }
-};
-
-const play = () => {
-  if (gameState.mode === "race") {
-    if (gameState.car.pos.z >= CONFIG.ROAD.LENGHT - 100) {
-      gameState.state = "finished";
-    }
-  }
-  if (gameState.mode === "INFINITY") {
-    if (gameState.car.pos.z >= gameState.road.center.z) {
-      gameState.environments.forEach((shape) => {
-        shape.points.forEach((point) => {
-          point.z += CONFIG.ROAD.LENGHT / 3;
-        });
-        shape.center.z += CONFIG.ROAD.LENGHT / 3;
-      });
-    }
-  }
-
-  handleCamera();
-  update();
-
-  handleModes();
-  showScreens();
-  metaData();
 };
 
 function draw() {

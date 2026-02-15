@@ -15,7 +15,7 @@ const update = () => {
   gameState.citizens.forEach((car) => car.update());
 };
 
-const handleModes = () => {
+const handleViewModes = () => {
   if (keyIsDown(66) && resetsIn-- <= 0) {
     mode = mode = (mode + 1) % gameState.views.length;
     resetsIn = 5;
