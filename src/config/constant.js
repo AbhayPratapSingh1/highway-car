@@ -6,7 +6,7 @@ const WORLD_CONSTANTS = {
     SENSTIVITY: 3,
   },
   WORLD: {
-    FRICTION: 0.1,
+    FRICTION: 0.15,
   },
   CAMERA: {
     X: 0,

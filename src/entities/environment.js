@@ -48,7 +48,6 @@ const createStaticShape = (x, y, z, w = 10, h = 1, d = 100, color, stroke) => {
   };
 
   return {
-    // points: [p1, p2, p3, p4],
     getFaces: () => face,
     pos: createVector(x, y, z),
   };
