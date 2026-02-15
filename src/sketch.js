@@ -13,6 +13,7 @@ const gameState = {
   sun: null,
   citizens: [],
   camera: null,
+  views: [],
 };
 
 function setup() {
@@ -28,18 +29,27 @@ function setup() {
   createEnvironment(gameState);
 
   gameState.camera = createCamera();
+
+  gameState.views = createView();
 }
+
+let mode = -1;
+let s = 0;
+let resetsIn = 0;
+
+
 
 function draw() {
   translate(width / 2, height / 2);
+  background("#4A90E2");
 
   handleCamera();
   update();
 
-  setBackgrounds();
-
-  renderEnvirnment(gameState.environments, gameState.camera);
-
-  renderCars(gameState);
+  handleModes();
+  showScreens();
   metaData();
+
+  
+  // noLoop();
 }

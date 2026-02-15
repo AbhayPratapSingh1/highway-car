@@ -12,6 +12,10 @@ const handleCamera = () => {
   if (!nearlyEqual(Math.abs(diff.x), camera_car_gap.x, 2)) {
     gameState.camera.points.x += diff.x / 5;
   }
+
+  gameState.views.forEach((view) => {
+    view.update();
+  });
 };
 
 const nearlyEqual = (a, b, delta = 0.001) => {
@@ -21,4 +25,15 @@ const nearlyEqual = (a, b, delta = 0.001) => {
 const update = () => {
   gameState.car.update();
   gameState.citizens.forEach((car) => car.update());
+};
+
+const handleModes = () => {
+  if (keyIsDown(66) && resetsIn-- <= 0) {
+    mode = mode = (mode + 1) % gameState.views.length;
+    resetsIn = 5;
+  }
+
+  if (keyIsDown(65)) {
+    mode = -1;
+  }
 };

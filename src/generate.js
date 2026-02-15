@@ -7,26 +7,76 @@ const createCamera = () => {
   };
 };
 
-const createBars = () => {
-  const bars = [];
-  for (let z = 20; z < WORLD_CONSTANTS.ROAD.LENGHT; z += 250) {
-    const bar = createRoadBar(0, 90, z);
-    bars.push(bar);
-  }
-  return bars;
+const carSideView = (sideOffset = 1, hOff = 0.5, dOff = 0) => {
+  const { x, y, z, rx, ry, rz } = CAMERA_CONFIGURATION;
+  const car = CAR_CONFIGURATION;
+
+  const points = createVector(
+    car.x - gameState.car.shape.w * sideOffset,
+    car.y - gameState.car.shape.h * hOff,
+    car.z - gameState.car.shape.d * dOff,
+  );
+  return {
+    points,
+    rotate: createVector(radians(0), radians(0), radians(0)),
+    update: () => {
+      points.x = gameState.car.pos.x - gameState.car.shape.w * sideOffset;
+      points.y = gameState.car.pos.y - gameState.car.shape.h * hOff;
+      points.z = gameState.car.pos.z - gameState.car.shape.d * dOff;
+    },
+  };
 };
 
-const createRoadBar = (x, y, z, w = 10, h = 1, d = 100) => {
-  const bar = new Cube(x, y, z, h, w, d, ["white"], "black");
-  return bar;
+const carSideBackView = (sideOffset = 1, hOff = 0.5, dOff = 0) => {
+  const { x, y, z, rx, ry, rz } = CAMERA_CONFIGURATION;
+  const car = CAR_CONFIGURATION;
+
+  const points = createVector(
+    car.x - gameState.car.shape.w * sideOffset,
+    car.y - gameState.car.shape.h * hOff,
+    car.z - gameState.car.shape.d * dOff,
+  );
+  return {
+    points,
+    rotate: createVector(radians(0), radians(180), radians(0)),
+    update: () => {
+      points.x = gameState.car.pos.x - gameState.car.shape.w * sideOffset;
+      points.y = gameState.car.pos.y - gameState.car.shape.h * hOff;
+      points.z = gameState.car.pos.z - gameState.car.shape.d * dOff;
+    },
+  };
+};
+
+const createBackView = (zOff = 1000) => {
+  const { x, y, z, rx, ry, rz } = CAMERA_CONFIGURATION;
+  const points = createVector(x, y, z);
+  console.log(gameState.car.pos.x);
+  return {
+    points,
+    rotate: createVector(radians(rx - 30), radians(ry - 180), radians(rz)),
+
+    update: () => {
+      points.x = gameState.camera.points.x;
+      points.y = gameState.camera.points.y;
+      points.z = gameState.camera.points.z + zOff;
+    },
+  };
+};
+const createView = () => {
+  const views = [
+    carSideView(1, 0.5, 0.2),
+    carSideView(-1, 0.5, 0.2),
+    createBackView(),
+    carSideBackView(1, 0.5, -0.5),
+    carSideBackView(-1, 0.5, -0.5),
+  ];
+  return views;
 };
 
 const createEnvironment = (gameState) => {
-  const highway = createHighway();
-  const ground = createGround();
-  const bars = createBars();
-
-  gameState.environments.push(ground, highway, ...bars);
+  createGround(gameState.environments);
+  createHighway(gameState.environments);
+  createBars(gameState.environments);
 };
 
 const createOtherCars = (count = 2, from = -400, to = 10000) => {

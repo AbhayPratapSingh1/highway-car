@@ -47,42 +47,42 @@ class Cube {
     return [f1, f2, f3, f4, f5, f6];
   }
 
-  changeRotation(x = 0, y = 0, z = 0) {
-    this.rotations.add(createVector(x, y, z));
-  }
+  // changeRotation(x = 0, y = 0, z = 0) {
+  //   this.rotations.add(createVector(x, y, z));
+  // }
 
-  rotateInAxis(point, angle, fromAxis = "x", toAxis = "y") {
-    let c = cos(angle);
-    let s = sin(angle);
+  // rotateInAxis(point, angle, fromAxis = "x", toAxis = "y") {
+  //   let c = cos(angle);
+  //   let s = sin(angle);
 
-    let fromAxisPoint = point[fromAxis] * c - point[toAxis] * s;
-    let toAxisPoint = point[fromAxis] * s + point[toAxis] * c;
+  //   let fromAxisPoint = point[fromAxis] * c - point[toAxis] * s;
+  //   let toAxisPoint = point[fromAxis] * s + point[toAxis] * c;
 
-    return [fromAxisPoint, toAxisPoint];
-  }
+  //   return [fromAxisPoint, toAxisPoint];
+  // }
 
-  rotateVertices() {
-    this.OGpoint.forEach((point, i) => {
-      let newX, newY, newZ;
-      let dx = 0, dy = 0, dz = 0;
+  // rotateVertices() {
+  //   this.OGpoint.forEach((point, i) => {
+  //     let newX, newY, newZ;
+  //     let dx = 0, dy = 0, dz = 0;
 
-      [newY, newZ] = this.rotateInAxis(point, this.rotations.x, "y", "z");
-      dy += newY - point.y;
-      dz += newZ - point.z;
+  //     [newY, newZ] = this.rotateInAxis(point, this.rotations.x, "y", "z");
+  //     dy += newY - point.y;
+  //     dz += newZ - point.z;
 
-      [newZ, newX] = this.rotateInAxis(point, this.rotations.y, "z", "x");
-      dx += newX - point.x;
-      dz += newZ - point.z;
+  //     [newZ, newX] = this.rotateInAxis(point, this.rotations.y, "z", "x");
+  //     dx += newX - point.x;
+  //     dz += newZ - point.z;
 
-      [newX, newY] = this.rotateInAxis(point, this.rotations.z, "x", "y");
-      dx += newX - point.x;
-      dy += newY - point.y;
+  //     [newX, newY] = this.rotateInAxis(point, this.rotations.z, "x", "y");
+  //     dx += newX - point.x;
+  //     dy += newY - point.y;
 
-      this.points[i].x = point.x + dx;
-      this.points[i].y = point.y + dy;
-      this.points[i].z = point.z + dz;
-    });
-  }
+  //     this.points[i].x = point.x + dx;
+  //     this.points[i].y = point.y + dy;
+  //     this.points[i].z = point.z + dz;
+  //   });
+  // }
 
   getFaces() {
     // this.OGpoint = this.createVertices();

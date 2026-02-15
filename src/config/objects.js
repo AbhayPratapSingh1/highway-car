@@ -11,9 +11,9 @@ const CAR_CONFIGURATION = {
 
 const CAMERA_CONFIGURATION = {
   x: 0,
-  y: -250,
-  z: -100,
-  rx: 40,
+  y: -100,
+  z: -500,
+  rx: 30,
   ry: 0,
   rz: 0,
 };
