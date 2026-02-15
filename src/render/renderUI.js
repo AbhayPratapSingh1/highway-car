@@ -86,11 +86,12 @@ const metaData = () => {
   push();
   noStroke();
   fill(0);
+  textSize(14);
   translate(-width / 2, -height / 2);
   text(`FPS : ${Math.floor(frameRate())}`, width - 150, 60);
   pop();
-  s += frameRate();
-  console.log("AVG FPS:", round(s / frameCount));
+  gameState.framesRendered += frameRate();
+  console.log("AVG FPS:", round(gameState.framesRendered / gameState.count));
 };
 
 const showScreens = () => {

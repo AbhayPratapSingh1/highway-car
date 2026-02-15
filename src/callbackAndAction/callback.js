@@ -12,27 +12,24 @@ const createOptions = (options) => {
 
 const startGameOptions = createOptions([
   {
-    name: "Start Game",
+    name: "Normal",
     action: () => {
-      gameState.state = "play";
+      startNewGame();
+      gameState.mode = "race";
     },
   },
-  { name: "Exit", action: () => gameState.state = "exit" },
-]);
+  {
+    name: "Infinity Run",
+    action: () => {
+      gameState.mode = "INFINITY";
 
-const pauseOptions = createOptions([
-  { name: "Resume", action: () => gameState.state = "play" },
-  { name: "Home", action: () => {} },
-]);
-
-const gameOverOption = createOptions([
-  { name: "Home", action: () => {} },
+      startNewGame();
+    },
+  },
 ]);
 
 const MOUSE_CALLBACK_OPTIONS = {
   "home": startGameOptions,
-  "pause": pauseOptions,
-  "game-over": gameOverOption,
 };
 
 function mousePressed() {
@@ -55,17 +52,15 @@ const showMouseCallbackOption = () => {
   const options = MOUSE_CALLBACK_OPTIONS[gameState.state];
   if (options) {
     push();
-    translate(width / 2, height / 2);
 
     textSize(30);
     textAlign("center", "center");
 
     options.forEach((option) => {
+      fill(10, 200);
+      rect(option.x, option.y, option.w, option.h, 10, 10, 10, 10);
       fill("white");
       text(option.name, 0, option.y + 25);
-      fill(255, 60);
-
-      rect(option.x, option.y, option.w, option.h, 10, 10, 10, 10);
     });
     pop();
   }

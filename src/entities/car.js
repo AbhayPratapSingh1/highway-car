@@ -7,7 +7,7 @@ const createCar = () => {
 };
 
 const createCitizenCar = (x, y, z, h, w, d) => {
-  const colors = [random(WORLD_CONSTANTS.UNIVERSAL_PALETTE)];
+  const colors = [random(CONFIG.UNIVERSAL_PALETTE)];
   const stroke = [0, 0, 0, 50];
   const carShape = new CarShape(x, y, z, h, w, d, colors, stroke);
   return new CitizensCar(carShape);
@@ -26,7 +26,7 @@ class CitizensCar {
   }
 
   updatePos = () => {
-    const delta = (WORLD_CONSTANTS.ROAD.WIDTH - this.shape.w) / 2;
+    const delta = (CONFIG.ROAD.WIDTH - this.shape.w) / 2;
     this.pos.add(this.v);
 
     const otherCars = gameState.citizens.filter((each) => each !== this);
@@ -49,7 +49,10 @@ class CitizensCar {
     this.updatePos();
 
     this.a.mult(0.9);
-    this.v.mult(WORLD_CONSTANTS.WORLD.FRICTION);
+    this.v.mult(CONFIG.WORLD.FRICTION);
+    if (this.pos.z > gameState.road.center.z + CONFIG.ROAD.LENGHT / 2) {
+      this.pos.z = random(-10000, 0);
+    }
   }
 }
 
@@ -62,7 +65,7 @@ class Car {
   }
 
   callback() {
-    const deltaZ = WORLD_CONSTANTS.CAR.SENSTIVITY;
+    const deltaZ = CONFIG.CAR.SENSTIVITY;
     const deltaX = deltaZ * this.v.z / 5;
 
     if (keyIsDown(UP_ARROW)) this.a.add(0, 0, deltaZ);
@@ -74,7 +77,7 @@ class Car {
   }
 
   updatePos = () => {
-    const delta = (WORLD_CONSTANTS.ROAD.WIDTH - this.shape.w) / 2;
+    const delta = (CONFIG.ROAD.WIDTH - this.shape.w) / 2;
     this.pos.add(this.v);
 
     const collidingCar = gameState.citizens.find((car) =>
@@ -103,7 +106,7 @@ class Car {
     this.updatePos();
 
     this.a.mult(0.9);
-    this.v.mult(WORLD_CONSTANTS.WORLD.FRICTION);
+    this.v.mult(CONFIG.WORLD.FRICTION);
   }
 }
 class CarShape {

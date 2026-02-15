@@ -1,4 +1,4 @@
-const WORLD_CONSTANTS = {
+const CONFIG = {
   SCREEN: {
     Z: 700,
   },
@@ -22,7 +22,7 @@ const WORLD_CONSTANTS = {
 
   ROAD: {
     WIDTH: 1000,
-    LENGHT: 100_000,
+    LENGHT: 50_000,
   },
 
   UNIVERSAL_PALETTE: [

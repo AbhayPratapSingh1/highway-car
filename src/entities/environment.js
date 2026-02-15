@@ -1,29 +1,29 @@
 // @ts-nocheck
 
-const createHighway = (environments) => {
-  const l = WORLD_CONSTANTS.ROAD.LENGHT;
-  const w = WORLD_CONSTANTS.ROAD.WIDTH;
+const createHighway = (gameState) => {
+  const l = CONFIG.ROAD.LENGHT;
+  const w = CONFIG.ROAD.WIDTH;
   const color = [40, 40, 40];
   const stroke = [0, 0, 0, 0];
 
   const shape = createStaticShape(0, 100, l / 2, w, 10, l, color, stroke);
-
-  environments.push(shape);
+  gameState.road = shape;
+  gameState.environments.push(shape);
 };
 
-const createGround = (environments) => {
-  const l = WORLD_CONSTANTS.ROAD.LENGHT;
-  const w = WORLD_CONSTANTS.ROAD.LENGHT;
+const createGround = (gameState) => {
+  const l = CONFIG.ROAD.LENGHT;
+  const w = CONFIG.ROAD.LENGHT;
   const color = "#388E3C";
   const stroke = [0, 0, 0, 0];
 
   const shape = createStaticShape(0, 100, l / 2, w, 10, l, color, stroke);
-
-  environments.push(shape);
+  gameState.ground = shape;
+  gameState.environments.push(shape);
 };
 
 const createBars = (environments) => {
-  for (let z = 20; z < WORLD_CONSTANTS.ROAD.LENGHT; z += 250) {
+  for (let z = 20; z < CONFIG.ROAD.LENGHT; z += 250) {
     const bar = createRoadBar(0, 100, z);
     environments.push(bar);
   }
@@ -48,6 +48,8 @@ const createStaticShape = (x, y, z, w = 10, h = 1, d = 100, color, stroke) => {
   };
 
   return {
+    center: centerOfFace(p1, p2, p3, p4),
+    points: [p1, p2, p3, p4],
     getFaces: () => face,
     pos: createVector(x, y, z),
   };

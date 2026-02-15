@@ -31,7 +31,7 @@ const normal = (p1, p2, p3) => {
   return s2.cross(s1);
 };
 
-const getProspectivePoint = (point, screen = WORLD_CONSTANTS.SCREEN.Z) => {
+const getProspectivePoint = (point, screen = CONFIG.SCREEN.Z) => {
   const zUnitVector = createVector(0, 0, 1);
 
   const zProjectionP1 = point.dot(zUnitVector);
@@ -67,7 +67,7 @@ const getAllFacesWithDetail = (objects) => {
 
 const getSortedFaces = (faces) => faces.sort((a, b) => b.center.z - a.center.z);
 
-const projectionPoint = (point, z = WORLD_CONSTANTS.SCREEN.Z) =>
+const projectionPoint = (point, z = CONFIG.SCREEN.Z) =>
   getProspectivePoint(point, z);
 
 const faceProjection = ({ points, ...props }) => {

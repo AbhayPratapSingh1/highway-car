@@ -66,7 +66,7 @@ const carSideBackView = (sideOffset = 1, hOff = 0.5, dOff = 0) => {
 const createBackView = (zOff = 1000) => {
   const { x, y, z, rx, ry, rz } = CAMERA_CONFIGURATION;
   const points = createVector(x, y, z);
-  console.log(gameState.car.pos.x);
+
   return {
     points,
     rotate: createVector(radians(rx - 30), radians(ry - 180), radians(rz)),
@@ -90,15 +90,15 @@ const createView = () => {
 };
 
 const createEnvironment = (gameState) => {
-  createGround(gameState.environments);
-  createHighway(gameState.environments);
+  createGround(gameState);
+  createHighway(gameState);
   createBars(gameState.environments);
 };
 
-const createOtherCars = (count = 2, from = -400, to = 10000) => {
+const createOtherCars = (count = 2, from = -1000, to = CONFIG.ROAD.LENGHT) => {
   const cars = [];
 
-  const w2 = WORLD_CONSTANTS.ROAD.WIDTH / 2;
+  const w2 = CONFIG.ROAD.WIDTH / 2;
 
   for (let i = 0; i < count; i++) {
     const x = random(-w2, w2);
